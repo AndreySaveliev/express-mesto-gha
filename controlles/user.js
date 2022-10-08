@@ -25,12 +25,17 @@ const createUser = (req, res) => {
       });
     return;
   }
-  User.create({ name, about, avatar })
+  User.create({ name, about, avatar }, { runValidators: true })
     .then((user) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      res.status(500).send({ message: 'Ошибка по умолчинию' });
+      console.log(err.name)
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      } else {
+        res.status(500).send({ message: 'Ошибка по умолчинию' });
+      }
     });
 };
 
