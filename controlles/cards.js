@@ -15,13 +15,15 @@ const getCards = (req, res) => {
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  if (name.length < 2 || name.length > 30 || name === undefined) {
-    res.status(400).send({ message: 'Переданы некорректные данные при создании карточки. Имя должно быть от 2 до 30 символов' });
+  if (name === undefined || link === undefined) {
+    res.status(400).send({ message: 'Переданы некорректные данные при создании карточки. Карточка должны содержать имя и ссылку' });
     return;
   }
-  if (link === undefined) {
-    res.status(400).send({ message: 'Переданы некорректные данные при создании карточки. Карточка должны содержать ссылку' });
-    return;
+  if (name) {
+    if (name.length < 2 || name.length > 30 || name === undefined) {
+      res.status(400).send({ message: 'Переданы некорректные данные при создании карточки. Имя должно быть от 2 до 30 символов' });
+      return;
+    }
   }
   const owner = req.user._id;
   if (name === '' || link === '') {
