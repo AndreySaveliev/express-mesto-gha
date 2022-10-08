@@ -9,7 +9,7 @@ const getUsers = (req, res) => {
       }
       res.send({ data: users });
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).send({ message: 'Ошибка по умолчинию' });
     });
 };
