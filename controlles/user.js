@@ -1,4 +1,3 @@
-const { response } = require('express');
 const User = require('../models/user');
 
 const getUsers = (req, res) => {
@@ -17,7 +16,7 @@ const getUsers = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  if (name === null || about === null || avatar === null) {
+  if (name === undefined || about === undefined || avatar === undefined) {
     res
       .status(400)
       .send({
@@ -25,16 +24,12 @@ const createUser = (req, res) => {
       });
     return;
   }
-  User.create({ name, about, avatar }, { runValidators: true })
+  User.create({ name, about, avatar })
     .then((user) => {
-      res.send({ data: user});
+      res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      } else {
-        res.status(500).send({ message: 'Ошибка по умолчинию' });
-      }
+      res.status(500).send({ message: 'Ошибка по умолчинию' });
     });
 };
 
@@ -44,14 +39,14 @@ const getUser = (req, res) => {
     .then((user) => {
       if (user === null) {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+        return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
-      console.log(err)
       if (err.name === 'CastError') {
-        res.status(404).send({
-          message: 'Пользователь по указанному _id не найден.',
+        res.status(400).send({
+          message: 'Передан не корректное значение _id',
         });
         return;
       }
@@ -93,8 +88,12 @@ const changeUserAvatar = (req, res) => {
 
 const changeUserInfo = (req, res) => {
   const { name, about } = req.body;
-  if (name === '' || about === '') {
-    res.status(404).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
+  if (name < 2 || name > 30 || name === '') {
+    res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Имя должно быть от 2 до 30 символов' });
+    return;
+  }
+  if (about < 2 || about > 30 || about === '') {
+    res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Имя должно быть от 2 до 30 символов' });
     return;
   }
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
