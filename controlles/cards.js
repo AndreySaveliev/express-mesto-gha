@@ -8,7 +8,7 @@ const getCards = (req, res) => {
       }
       res.send({ data: cards });
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(500).send({ message: 'Ошибка по умолчинию' });
     });
 };
@@ -32,7 +32,7 @@ const createCard = (req, res) => {
   }
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
-    .catch((err) => {
+    .catch(() => {
       res.status(500).send({ message: 'Ошибка по умолчинию' });
     });
 };
