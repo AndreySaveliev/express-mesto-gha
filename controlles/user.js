@@ -17,7 +17,7 @@ const getUsers = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  if (name === '' || about === '' || avatar === '') {
+  if (name === null || about === null || avatar === null) {
     res
       .status(400)
       .send({
@@ -27,10 +27,9 @@ const createUser = (req, res) => {
   }
   User.create({ name, about, avatar }, { runValidators: true })
     .then((user) => {
-      res.send({ data: user });
+      res.send({ data: user});
     })
     .catch((err) => {
-      console.log(err.name)
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       } else {
@@ -43,9 +42,13 @@ const getUser = (req, res) => {
   const { userId } = req.params;
   User.findById({ _id: userId })
     .then((user) => {
+      if (user === null) {
+        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+      }
       res.send({ data: user });
     })
     .catch((err) => {
+      console.log(err)
       if (err.name === 'CastError') {
         res.status(404).send({
           message: 'Пользователь по указанному _id не найден.',
