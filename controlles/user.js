@@ -29,6 +29,11 @@ const createUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Длина имени и описания должна быть от 2 до 30 символов' });
+        return;
+      }
+      console.log(err.name);
       res.status(500).send({ message: 'Ошибка по умолчинию' });
     });
 };
@@ -88,12 +93,12 @@ const changeUserAvatar = (req, res) => {
 
 const changeUserInfo = (req, res) => {
   const { name, about } = req.body;
-  if (name < 2 || name > 30 || name === '') {
+  if (name.length < 2 || name.length > 30 || name === '') {
     res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Имя должно быть от 2 до 30 символов' });
     return;
   }
-  if (about < 2 || about > 30 || about === '') {
-    res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Имя должно быть от 2 до 30 символов' });
+  if (about.length < 2 || about.length > 30 || about === '') {
+    res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Описание должно быть от 2 до 30 символов' });
     return;
   }
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })

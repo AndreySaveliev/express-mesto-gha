@@ -4,7 +4,7 @@ const getCards = (req, res) => {
   Card.find({})
     .then((cards) => {
       if (cards.length === 0) {
-        res.status(404).send({ message: 'Карточек нет' });
+        res.status(404).send({ data: cards });
       }
       res.send({ data: cards });
     })
@@ -15,12 +15,12 @@ const getCards = (req, res) => {
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  if (name < 2 || name > 30 || name === undefined) {
-    res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Имя должно быть от 2 до 30 символов' });
+  if (name.length < 2 || name.length > 30 || name === undefined) {
+    res.status(400).send({ message: 'Переданы некорректные данные при создании карточки. Имя должно быть от 2 до 30 символов' });
     return;
   }
   if (link === undefined) {
-    res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля. Имя должно быть от 2 до 30 символов' });
+    res.status(400).send({ message: 'Переданы некорректные данные при создании карточки. Карточка должны содержать ссылку' });
     return;
   }
   const owner = req.user._id;
