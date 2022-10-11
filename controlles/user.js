@@ -12,13 +12,13 @@ const getUsers = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar }, { runValidators: true })
+  User.create([{ name, about, avatar }], { runValidators: true })
     .then((user) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Длина имени и описания должна быть от 2 до 30 символов' });
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
         return;
       }
       console.log(err.name);
