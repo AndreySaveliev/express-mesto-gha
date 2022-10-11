@@ -3,9 +3,6 @@ const Card = require('../models/card');
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => {
-      if (cards.length === 0) {
-        res.status(404).send({ data: cards });
-      }
       res.send({ data: cards });
     })
     .catch(() => {
@@ -15,31 +12,20 @@ const getCards = (req, res) => {
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  if (name === undefined || link === undefined) {
-    res.status(400).send({ message: 'Переданы некорректные данные при создании карточки. Карточка должны содержать имя и ссылку' });
-    return;
-  }
-  if (name) {
-    if (name.length < 2 || name.length > 30 || name === undefined) {
-      res.status(400).send({ message: 'Переданы некорректные данные при создании карточки. Имя должно быть от 2 до 30 символов' });
-      return;
-    }
-  }
   const owner = req.user._id;
-  if (name === '' || link === '') {
-    res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
-    return;
-  }
-  Card.create({ name, link, owner })
+  Card.create({ name, link, owner }, { new: true, runValidators: true })
     .then((card) => res.send({ data: card }))
-    .catch(() => {
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
+      }
       res.status(500).send({ message: 'Ошибка по умолчинию' });
     });
 };
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove({ _id: cardId })
+  Card.findByIdAndRemove({ _id: cardId }, { new: true, runValidators: true })
     .then((card) => {
       if (card === null) {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
@@ -48,7 +34,7 @@ const deleteCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
       } else {
         res.status(500).send({ message: 'Ошибка по умолчинию' });
