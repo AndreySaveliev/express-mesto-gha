@@ -5,14 +5,14 @@ const cardSchema = new mongoose.Schema({
     type: String,
     minlength: 2,
     maxlength: 30,
-    require: true,
+    required: true,
   },
   link: {
     type: String,
-    require: true,
+    required: true,
   },
   owner: {
-    require: true,
+    required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
   },
