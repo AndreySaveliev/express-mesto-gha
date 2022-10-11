@@ -14,14 +14,13 @@ const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create([{ name, about, avatar }], { runValidators: true })
     .then((user) => {
-      res.send({ data: user });
+      res.send({ data: user[0] });
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
         return;
       }
-      console.log(err.name);
       res.status(500).send({ message: 'Ошибка по умолчинию' });
     });
 };
@@ -60,7 +59,6 @@ const changeUserAvatar = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      console.log(err);
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         res
           .status(400)
