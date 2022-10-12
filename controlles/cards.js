@@ -18,6 +18,7 @@ const createCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
+        return;
       }
       res.status(500).send({ message: 'Ошибка по умолчинию' });
     });
@@ -34,7 +35,7 @@ const deleteCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
       } else {
         res.status(500).send({ message: 'Ошибка по умолчинию' });
