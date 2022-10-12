@@ -12,12 +12,12 @@ const getUsers = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  User.create([{ name, about, avatar }], { runValidators: true })
+  User.create({ name, about, avatar })
     .then((user) => {
-      res.send({ data: user[0] });
+      res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
         return;
       }
