@@ -7,6 +7,7 @@
     "no-param-reassign": "off",
     "consistent-return": "off",
     "no-unused-vars": ["error", { "args": "none" }],
-    "max-len": ["error", { "code": 150 }]
+    "max-len": ["error", { "code": 150 }],
+    "no-useless-escape": "off"
   }
 }
