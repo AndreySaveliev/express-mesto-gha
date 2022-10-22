@@ -38,6 +38,8 @@ const createUser = (req, res, next) => {
           }
           next(err);
         }));
+  } else {
+    throw new AuthError('Введите email')
   }
 };
 
