@@ -145,11 +145,14 @@ const changeUserInfo = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
+  if (password === null) {
+    throw new AuthError('Неправильные почта или пароль', 401);
+  }
   User.findOne({ email })
     .select('+password')
     .then((user) => {
       if (user === null) {
-        throw new AuthError('Неправильные почта или пароль', 400);
+        throw new AuthError('Неправильные почта или пароль', 401);
         // return res.status(401).send({ message: 'Неправильные почта или пароль' });
       }
       bcrypt.compare(password, user.password).then((matched) => {
