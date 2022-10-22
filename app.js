@@ -1,5 +1,5 @@
 const express = require('express');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { login, createUser } = require('./controlles/user');
@@ -40,7 +40,10 @@ app.use('*', (req, res) => {
   res.status(404).send({ message: 'Такого пути не существует' });
 });
 
+app.use(errors());
+
 app.use((err, req, res, next) => {
+  console.log(1);
   if (err.statusCode === 400) {
     return res.status(err.statusCode).send({ message: err.message });
   }
