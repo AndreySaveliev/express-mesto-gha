@@ -41,7 +41,7 @@ app.use((err, req, res, next) => {
   }
   if (err.code === 11000) {
     return res
-      .status(401)
+      .status(409)
       .send({ message: 'Пользователь с таким email уже зарегистрирован' });
   }
   if (err.name === 'ValidationError') {
