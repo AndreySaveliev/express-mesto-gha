@@ -7,7 +7,7 @@ const NotFoundError = require('../Errors/NotFoundError');
 const RequestError = require('../Errors/RequestError');
 require('dotenv').config();
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET = 'YANDEX' } = process.env;
 
 const getUsers = (req, res, next) => {
   User.find({})

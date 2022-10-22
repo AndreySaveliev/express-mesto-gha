@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET = 'YANDEX' } = process.env;
 
 module.exports = (req, res, next) => {
   const { cookie } = req.headers;
