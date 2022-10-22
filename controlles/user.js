@@ -127,13 +127,13 @@ const login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (user === null) {
-        throw new AuthError('Неправильные почта или пароль');
+        throw new AuthError('Неправильные почта или пароль', 401);
         // return res.status(401).send({ message: 'Неправильные почта или пароль' });
       }
       bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            throw new AuthError('Неправильные почта или пароль');
+            throw new AuthError('Неправильные почта или пароль', 400);
             // return res.status(401).send({ message: 'Неправильные почта или пароль' });
           }
           const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
@@ -141,13 +141,12 @@ const login = (req, res, next) => {
             maxAge: 3600 * 24 * 7,
             httpOnly: true,
           });
-          return res.status(200).send({ data: user });
+          return res.send({ data: user });
         });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         err.message = 'Переданы некорректные данные';
-        next(err);
         // res.status(400).send({
         //   message: 'Переданы некорректные данные',
         // });
