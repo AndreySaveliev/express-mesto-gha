@@ -27,6 +27,9 @@ app.use('*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
+  if (err.statusCode === 400) {
+    return res.status(err.statusCode).send({ message: err.message });
+  }
   if (err.statusCode === 401) {
     return res.status(err.statusCode).send({ message: err.message });
   }
