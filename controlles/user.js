@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs/dist/bcrypt');
 const User = require('../models/user');
 const AuthError = require('../Errors/AuthError');
 const NotFoundError = require('../Errors/NotFoundError');
+const RequestError = require('../Errors/RequestError');
 require('dotenv').config();
 
 const { JWT_SECRET } = process.env;
@@ -24,6 +25,9 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
+  if (email === undefined || password === undefined) {
+    throw new RequestError('Ведите корректное данные.');
+  }
   if (validator.isEmail(email)) {
     bcrypt.hash(password, 10)
       .then((hash) => User.create({
@@ -39,7 +43,7 @@ const createUser = (req, res, next) => {
           next(err);
         }));
   } else {
-    throw new AuthError('Введите email')
+    throw new RequestError('Введите email');
   }
 };
 
