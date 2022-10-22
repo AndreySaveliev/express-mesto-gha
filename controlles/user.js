@@ -29,19 +29,32 @@ const createUser = (req, res, next) => {
     throw new RequestError('Ведите корректное данные.');
   }
   if (validator.isEmail(email)) {
-    bcrypt.hash(password, 10)
-      .then((hash) => User.create({
-        name, about, avatar, email, password: hash,
+    bcrypt.hash(password, 10).then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    })
+      .then((user) => {
+        res.send({
+          data: {
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            email: user.email,
+            _id: user._id,
+            __v: user.__v,
+          },
+        });
       })
-        .then((user) => {
-          res.send({ data: user });
-        })
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            err.message = 'Переданы некорректные данные';
-          }
-          next(err);
-        }));
+      .catch((err) => {
+        console.log(err);
+        if (err.name === 'ValidationError') {
+          err.message = 'Переданы некорректные данные';
+        }
+        next(err);
+      }));
   } else {
     throw new RequestError('Введите email');
   }
@@ -74,7 +87,11 @@ const getUser = (req, res, next) => {
 
 const changeUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    { new: true, runValidators: true },
+  )
     .then((user) => {
       if (user === null) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
@@ -99,7 +116,11 @@ const changeUserAvatar = (req, res, next) => {
 
 const changeUserInfo = (req, res, next) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, about },
+    { new: true, runValidators: true },
+  )
     .then((user) => {
       if (user === null) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
@@ -124,25 +145,27 @@ const changeUserInfo = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email }).select('+password')
+  User.findOne({ email })
+    .select('+password')
     .then((user) => {
       if (user === null) {
-        throw new AuthError('Неправильные почта или пароль', 401);
+        throw new AuthError('Неправильные почта или пароль', 400);
         // return res.status(401).send({ message: 'Неправильные почта или пароль' });
       }
-      bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            throw new AuthError('Неправильные почта или пароль', 400);
-            // return res.status(401).send({ message: 'Неправильные почта или пароль' });
-          }
-          const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-          res.cookie('Bearer ', token, {
-            maxAge: 3600 * 24 * 7,
-            httpOnly: true,
-          });
-          return res.send({ data: user });
+      bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          throw new AuthError('Неправильные почта или пароль', 401);
+          // return res.status(401).send({ message: 'Неправильные почта или пароль' });
+        }
+        const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+          expiresIn: '7d',
         });
+        res.cookie('Bearer ', token, {
+          maxAge: 3600 * 24 * 7,
+          httpOnly: true,
+        });
+        return res.send({ data: user });
+      });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
