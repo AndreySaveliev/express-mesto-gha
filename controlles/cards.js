@@ -32,29 +32,21 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  // if (req.user._id !== req.params.owner) {
-  //   throw new AuthError('Вы не можете удалять карточки других пользователей.')
-  // return res.status(401).send({ message: 'Вы не можете удалять карточки других пользователей.' });
-  // }
   Card.findByIdAndRemove({ _id: cardId }, { new: true, runValidators: true })
     .then((card) => {
-      if (req.user._id !== card.owner) {
-        throw new AuthError('Вы не можете удалять карточки других пользователей.');
-      }
       if (card === null) {
-        throw new NotFoundError('Карточка с указанным _id не найдена.');
-        // res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
-        // return;
+        throw new NotFoundError('Карточка с указанным _id не найдена.', 404);
+      }
+      if (req.user._id !== card.owner.toString()) {
+        throw new AuthError('Вы не можете удалять карточки других пользователей.', 403);
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         err.message = 'Переданы некорректные данные для удаления карточки.';
-        // res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
       } else {
         next(err);
-        // res.status(500).send({ message: 'Ошибка по умолчинию' });
       }
     });
 };
@@ -65,19 +57,15 @@ const putLike = (req, res, next) => {
   Card.findByIdAndUpdate({ _id: cardId }, { $addToSet: { likes: userId } }, { new: true })
     .then((card) => {
       if (card === null) {
-        throw new NotFoundError('Карточка с указанным _id не найдена.');
-        // res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
-        // return;
+        throw new NotFoundError('Карточка с указанным _id не найдена.', 404);
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         err.message = 'Переданы некорректные данные для постановки/снятии лайка.';
-        // res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
       } else {
         next(err);
-        // res.status(500).send({ message: 'Ошибка по умолчинию' });
       }
     });
 };
@@ -88,19 +76,15 @@ const deleteLike = (req, res, next) => {
   Card.findByIdAndUpdate({ _id: cardId }, { $pull: { likes: userId } }, { new: true })
     .then((card) => {
       if (card === null) {
-        throw new NotFoundError('Карточка с указанным _id не найдена.');
-        // res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
-        // return;
+        throw new NotFoundError('Карточка с указанным _id не найдена.', 404);
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         err.message = 'Переданы некорректные данные для постановки/снятии лайка.';
-        // res.status(400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' });
       } else {
         next(err);
-        // res.status(500).send({ message: 'Ошибка по умолчинию' });
       }
     });
 };

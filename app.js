@@ -36,14 +36,16 @@ app.use(auth);
 app.use('/users', require('./routes/user'));
 app.use('/cards', require('./routes/card'));
 
+app.use(errors());
+
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'Такого пути не существует' });
 });
 
-app.use(errors());
-
 app.use((err, req, res, next) => {
-  console.log(1);
+  if (err.statusCode === 403) {
+    return res.status(err.statusCode).send({ message: err.message });
+  }
   if (err.statusCode === 400) {
     return res.status(err.statusCode).send({ message: err.message });
   }
@@ -51,7 +53,7 @@ app.use((err, req, res, next) => {
     return res.status(err.statusCode).send({ message: err.message });
   }
   if (err.name === 'CastError') {
-    return res.status(400).send({ message: err.message });
+    return res.status(404).send({ message: err.message });
   }
   if (err.statusCode === 404) {
     return res.status(err.statusCode).send({ message: err.message });

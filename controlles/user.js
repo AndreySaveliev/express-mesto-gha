@@ -15,10 +15,6 @@ const getUsers = (req, res, next) => {
       res.send({ data: users });
     })
     .catch((err) => next(err));
-
-  // {
-  //   res.status(500).send({ message: 'Ошибка по умолчинию' });
-  // });
 };
 
 const createUser = (req, res, next) => {
@@ -49,7 +45,6 @@ const createUser = (req, res, next) => {
         });
       })
       .catch((err) => {
-        console.log(err);
         if (err.name === 'ValidationError') {
           err.message = 'Переданы некорректные данные';
         }
@@ -65,23 +60,15 @@ const getUser = (req, res, next) => {
   User.findById({ _id: userId })
     .then((user) => {
       if (user === null) {
-        throw new NotFoundError('Пользователь с указанным _id не найден.');
-        // res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-        // return;
+        throw new NotFoundError('Пользователь с указанным _id не найден.', 404);
       }
       res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        // res.status(400).send({
-        //   message: 'Передан не корректное значение _id',
-        // });
         err.message = 'Передан не корректное значение _id';
       }
       next(err);
-      // res.status(500).send({
-      //   message: 'Ошибка по умолчинию.',
-      // });
     });
 };
 
@@ -94,9 +81,7 @@ const changeUserAvatar = (req, res, next) => {
   )
     .then((user) => {
       if (user === null) {
-        throw new NotFoundError('Пользователь с указанным _id не найден.');
-        // res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-        // return;
+        throw new NotFoundError('Пользователь с указанным _id не найден.', 404);
       }
       res.send({ data: user });
     })
@@ -104,12 +89,8 @@ const changeUserAvatar = (req, res, next) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         err.message = 'Переданы некорректные данные';
         next(err);
-        // res
-        //   .status(400)
-        //   .send({ message: 'Переданы некорректные данные' });
       } else {
         next(err);
-        // res.status(500).send({ message: 'Ошибка по умолчинию' });
       }
     });
 };
@@ -123,9 +104,7 @@ const changeUserInfo = (req, res, next) => {
   )
     .then((user) => {
       if (user === null) {
-        throw new NotFoundError('Пользователь с указанным _id не найден.');
-        // res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-        // return;
+        throw new NotFoundError('Пользователь с указанным _id не найден.', 404);
       }
       res.send({ data: user });
     })
@@ -133,12 +112,8 @@ const changeUserInfo = (req, res, next) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         err.message = 'Переданы некорректные данные';
         next(err);
-        // res.status(400).send({
-        //   message: 'Переданы некорректные данные. ',
-        // });
       } else {
         next(err);
-        // res.status(500).send({ message: 'Ошибка по умолчинию' });
       }
     });
 };
@@ -150,12 +125,10 @@ const login = (req, res, next) => {
     .then((user) => {
       if (user === null) {
         throw new AuthError('Неправильные почта или пароль', 401);
-        // return res.status(401).send({ message: 'Неправильные почта или пароль' });
       }
       bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
           throw new AuthError('Неправильные почта или пароль', 401);
-          // return res.status(401).send({ message: 'Неправильные почта или пароль' });
         }
         const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
           expiresIn: '7d',
@@ -170,12 +143,8 @@ const login = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         err.message = 'Переданы некорректные данные';
-        // res.status(400).send({
-        //   message: 'Переданы некорректные данные',
-        // });
       } else {
         next(err);
-        // res.status(500).send({ message: 'Ошибка по умолчинию' });
       }
     });
 };
@@ -185,9 +154,7 @@ const getMe = (req, res, next) => {
   User.findById({ _id: userId })
     .then((user) => {
       if (user === null) {
-        throw new NotFoundError('Пользователь с указанным _id не найден.');
-        // res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-        // return;
+        throw new NotFoundError('Пользователь с указанным _id не найден.', 404);
       }
       res.send({ data: user });
     })
@@ -195,15 +162,8 @@ const getMe = (req, res, next) => {
       if (err.name === 'CastError') {
         err.message = 'Передан не корректное значение _id';
         next(err);
-        // res.status(400).send({
-        //   message: 'Передан не корректное значение _id',
-        // });
-        // return;
       }
       next(err);
-      // res.status(500).send({
-      //   message: 'Ошибка по умолчинию.',
-      // });
     });
 };
 
