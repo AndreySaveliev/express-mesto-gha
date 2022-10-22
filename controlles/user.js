@@ -33,6 +33,9 @@ const createUser = (req, res, next) => {
           res.send({ data: user });
         })
         .catch((err) => {
+          if (err.name === 'ValidationError') {
+            err.message = 'Переданы некорректные данные';
+          }
           next(err);
         }));
   }
