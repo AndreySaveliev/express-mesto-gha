@@ -39,12 +39,12 @@ app.use('/cards', require('./routes/card'));
 
 app.use(errors());
 
-app.use('*', () => {
+app.use('*', (req, res, next) => {
   // res.status(404).send({ message: 'Такого пути не существует' });
   throw new Error404('Такого пути не существует');
 });
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   console.log(err);
   if (err.statusCode) {
     return res.status(err.statusCode).send({ message: err.message });
