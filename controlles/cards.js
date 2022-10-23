@@ -21,9 +21,10 @@ const createCard = (req, res, next) => {
     .then((card) => res.send({ data: card[0] }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new Error400('Переданы некорректные данные при создании карточки');
+        next(new Error400('Переданы некорректные данные при создании карточки'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -43,9 +44,10 @@ const deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new Error401('Переданы некорректные данные для удаления карточки.');
+        next(new Error401('Переданы некорректные данные для удаления карточки.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -61,9 +63,10 @@ const putLike = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new Error400('Переданы некорректные данные для постановки/снятии лайка.');
+        next(new Error400('Переданы некорректные данные для постановки/снятии лайка.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -79,9 +82,10 @@ const deleteLike = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new Error400('Переданы некорректные данные для постановки/снятии лайка.');
+        next(new Error400('Переданы некорректные данные для постановки/снятии лайка.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 

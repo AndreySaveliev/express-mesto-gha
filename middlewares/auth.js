@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    throw new Error401('Необходимо авторизироваться');
+    next(new Error401('Необходимо авторизироваться'));
   }
   req.user = payload;
   next();

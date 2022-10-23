@@ -43,11 +43,11 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.code === 11000) {
         next(new Error409('Пользователь с таким email уже зарегистрирован'));
+      } else if (err.name === 'ValidationError') {
+        next(new Error400('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-      if (err.name === 'ValidationError') {
-        throw new Error400('Переданы некорректные данные');
-      }
-      next(err);
     }));
 };
 
@@ -62,9 +62,10 @@ const getUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new Error400('Передан не корректное значение _id');
+        next(new Error400('Передан не корректное значение _id'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -83,9 +84,10 @@ const changeUserAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        throw Error400('Переданы некорректные данные');
+        next(new Error400('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -104,9 +106,10 @@ const changeUserInfo = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        throw new Error400('Переданы некорректные данные');
+        next(new Error400('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -148,9 +151,10 @@ const getMe = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new Error400('Передан не корректное значение _id');
+        next(new Error400('Передан не корректное значение _id'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
