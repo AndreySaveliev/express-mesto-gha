@@ -43,12 +43,13 @@ app.use('*', (req, res, next) => {
   next(new Error404('Такого пути не существует'));
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.log(err);
   if (err.statusCode) {
-    return res.status(err.statusCode).send({ message: err.message });
+    res.status(err.statusCode).send({ message: err.message });
+  } else {
+    res.status(500).send({ message: 'Ошибка по умолчинию' });
   }
-  res.status(500).send({ message: 'Ошибка по умолчинию' });
 });
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
