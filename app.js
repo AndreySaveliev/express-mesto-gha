@@ -43,8 +43,8 @@ app.use('*', (req, res, next) => {
   next(new Error404('Такого пути не существует'));
 });
 
-app.use((err, req, res) => {
-  console.log(err);
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
   if (err.statusCode) {
     res.status(err.statusCode).send({ message: err.message });
   } else {
