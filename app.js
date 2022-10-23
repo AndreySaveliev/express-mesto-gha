@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { login, createUser } = require('./controlles/user');
 const auth = require('./middlewares/auth');
+const Error404 = require('./Errors/Error404');
 require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
@@ -28,7 +29,7 @@ app.post('/signup', celebrate({
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
+    avatar: Joi.string().pattern(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_+~#?&/=]*)/),
   }),
 }), createUser);
 
@@ -38,33 +39,15 @@ app.use('/cards', require('./routes/card'));
 
 app.use(errors());
 
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Такого пути не существует' });
+app.use('*', (req, res, next) => {
+  // res.status(404).send({ message: 'Такого пути не существует' });
+  throw new Error404('Такого пути не существует');
 });
 
 app.use((err, req, res, next) => {
-  if (err.statusCode === 403) {
+  console.log(err);
+  if (err.statusCode) {
     return res.status(err.statusCode).send({ message: err.message });
-  }
-  if (err.statusCode === 400) {
-    return res.status(err.statusCode).send({ message: err.message });
-  }
-  if (err.statusCode === 401) {
-    return res.status(err.statusCode).send({ message: err.message });
-  }
-  if (err.name === 'CastError') {
-    return res.status(404).send({ message: err.message });
-  }
-  if (err.statusCode === 404) {
-    return res.status(err.statusCode).send({ message: err.message });
-  }
-  if (err.code === 11000) {
-    return res
-      .status(409)
-      .send({ message: 'Пользователь с таким email уже зарегистрирован' });
-  }
-  if (err.name === 'ValidationError') {
-    return res.status(400).send({ message: err.message });
   }
   res.status(500).send({ message: 'Ошибка по умолчинию' });
 });
