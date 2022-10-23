@@ -40,8 +40,7 @@ app.use('/cards', require('./routes/card'));
 app.use(errors());
 
 app.use('*', (req, res, next) => {
-  // res.status(404).send({ message: 'Такого пути не существует' });
-  throw new Error404('Такого пути не существует');
+  next(new Error404('Такого пути не существует'));
 });
 
 app.use((err, req, res, next) => {
