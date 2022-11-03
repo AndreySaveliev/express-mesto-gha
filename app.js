@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const { login, createUser } = require('./controlles/user');
 const auth = require('./middlewares/auth');
 const Error404 = require('./Errors/Error404');
+const CORS = require('./middlewares/CORS');
 require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
@@ -16,6 +17,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(CORS);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
