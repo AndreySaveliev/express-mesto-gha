@@ -6,6 +6,7 @@ const { login, createUser } = require('./controlles/user');
 const auth = require('./middlewares/auth');
 const Error404 = require('./Errors/Error404');
 const CORS = require('./middlewares/CORS');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
@@ -17,7 +18,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(requestLogger);
 app.use(CORS);
 
 app.post('/signin', celebrate({
@@ -41,6 +42,8 @@ app.use('/users', require('./routes/user'));
 app.use('/cards', require('./routes/card'));
 
 app.use(errors());
+
+app.user(errorLogger);
 
 app.use('*', (req, res, next) => {
   next(new Error404('Такого пути не существует'));
